@@ -1,11 +1,4 @@
 import os
-import warnings
-
-# Silenciar advertencias informativas de fin de vida de Python 3.9 y LibreSSL en macOS
-warnings.filterwarnings("ignore", category=FutureWarning, module="google.auth")
-warnings.filterwarnings("ignore", category=FutureWarning, module="google.oauth2")
-warnings.filterwarnings("ignore", category=Warning, module="urllib3")
-
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify
