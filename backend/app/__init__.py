@@ -1,0 +1,1 @@
+"""Scenia backend application package."""
