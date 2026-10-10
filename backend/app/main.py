@@ -1,39 +1,55 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.api.v1.router import api_router
+import os
 
+from dotenv import load_dotenv
+from flask import Flask, jsonify
+from flask_cors import CORS
 
-def create_app() -> FastAPI:
-    app = FastAPI(
-        title=settings.PROJECT_NAME,
-        openapi_url=f"{settings.API_V1_STR}/openapi.json",
-        docs_url="/docs",
-        redoc_url="/redoc",
-    )
+load_dotenv()
 
-    # CORS configuration
-    if settings.CORS_ORIGINS:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=[str(origin) for origin in settings.CORS_ORIGINS],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024
 
-    # Include API Routers
-    app.include_router(api_router, prefix=settings.API_V1_STR)
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
-    @app.get("/")
-    def root():
-        return {
-            "message": f"Welcome to {settings.PROJECT_NAME} API",
-            "docs": "/docs",
-            "status": "online",
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                "http://localhost:5173",
+                frontend_url,
+            ]
         }
+    },
+)
 
-    return app
+# Registrar blueprints
+from app.routes.guias import guias_bp
+from app.routes.reflexiones import reflexiones_bp
+from app.routes.metricas import metricas_bp
+
+app.register_blueprint(guias_bp)
+app.register_blueprint(reflexiones_bp)
+app.register_blueprint(metricas_bp)
 
 
-app = create_app()
+@app.get("/")
+def inicio():
+    return jsonify({
+        "mensaje": "CulturaMétrica API funcionando correctamente",
+        "version": "1.0.0",
+    })
+
+
+@app.get("/salud")
+def salud():
+    from app.services.gemini_service import client
+    return jsonify({
+        "estado": "ok",
+        "servicio": "CulturaMétrica API",
+        "gemini_configurado": client is not None,
+    })
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
