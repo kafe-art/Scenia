@@ -51,6 +51,7 @@ def post_generar_guia():
             try:
                 guia_a_guardar = {
                     "id_curso": 1,
+                    "id_docente_creador": 1,
                     "tema_didactico": tema,
                     "contenido": json.dumps(guia),
                     "estado": "PUBLISHED"
