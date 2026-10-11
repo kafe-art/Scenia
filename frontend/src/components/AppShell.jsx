@@ -24,7 +24,7 @@ export default function AppShell() {
       <a className="skip-link" href="#workspace-main">Saltar al contenido</a>
       <aside className={`sidebar ${menu ? 'is-open' : ''}`}>
         <Brand light />
-        <span className="sidebar-caption">MI ESPACIO CULTURAL</span>
+        <span className="sidebar-caption">{actor.sidebarCaption || 'MI ESPACIO CULTURAL'}</span>
         <nav aria-label="Menú principal">
           {links.map(([to, label, icon]) => (
             <NavLink key={to} to={to} end onClick={() => setMenu(false)}>
@@ -116,11 +116,51 @@ export default function AppShell() {
             </form>
           )}
 
+          {/* Selector de Roles / Actores (Captura 1 y 13) */}
+          <div className="hidden sm:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold ml-auto mr-3">
+            <NavLink
+              to="/estudiante"
+              className={() =>
+                `px-3 py-1 rounded-lg transition ${
+                  location.pathname.startsWith('/estudiante')
+                    ? 'bg-white text-slate-900 font-extrabold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`
+              }
+            >
+              Estudiante
+            </NavLink>
+            <NavLink
+              to="/docente"
+              className={() =>
+                `px-3 py-1 rounded-lg transition ${
+                  location.pathname.startsWith('/docente')
+                    ? 'bg-white text-slate-900 font-extrabold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`
+              }
+            >
+              Docente
+            </NavLink>
+            <NavLink
+              to="/admin"
+              className={() =>
+                `px-3 py-1 rounded-lg transition ${
+                  location.pathname.startsWith('/admin')
+                    ? 'bg-white text-slate-900 font-extrabold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`
+              }
+            >
+              Colegio
+            </NavLink>
+          </div>
+
           <Link className="account-pill" to="/ingresar">
             <span className="avatar small">{actor.initials}</span>
             <span className="account-pill-text">
               <strong className="account-pill-name">{actor.demoName}</strong>
-              <small className="account-pill-role">{role}</small>
+              <small className="account-pill-role">{actor.demoSubtitle || role}</small>
             </span>
           </Link>
         </header>
