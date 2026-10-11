@@ -78,8 +78,10 @@ function Docente() {
         obra_id: 1,
         ...form,
       })
-      setGuia(data.guia)
-      setPreguntasTexto((data.guia.preguntas_debate || []).join('\n'))
+      const g = data.guia || {}
+      setGuia(g)
+      const preguntas = g.preguntas_reflexion || g.preguntas_debate || []
+      setPreguntasTexto(Array.isArray(preguntas) ? preguntas.join('\n') : '')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -201,86 +203,284 @@ function Docente() {
         {aviso && <div className="dc-ok" role="status">{aviso}</div>}
 
         {guia && (
-          <>
-            {/* Versión editable (pantalla) */}
-            <div className="resultado">
-              <p className="dc-muted">Puedes editar cualquier parte de la guía antes de guardarla o imprimirla.</p>
-              <div className="form-group">
-                <label htmlFor="g-titulo">Título</label>
-                <input id="g-titulo" value={guia.titulo || ''} onChange={(e) => editarGuia('titulo', e.target.value)} />
+          <div className="dc-guia-container">
+            {/* Header del Kit Generado */}
+            <div className="dc-guia-header-card">
+              <div className="dc-guia-badge">
+                <span className="dc-sparkle">✦</span> KIT PEDAGÓGICO GENERADO POR IA
               </div>
-              <div className="form-group">
-                <label htmlFor="g-intro">Introducción</label>
-                <textarea id="g-intro" rows={3} value={guia.introduccion || ''} onChange={(e) => editarGuia('introduccion', e.target.value)} />
+              <div className="dc-guia-title-edit">
+                <label className="dc-label-inline">TÍTULO DE LA EXPERIENCIA TEATRAL</label>
+                <input
+                  className="dc-input-hero"
+                  value={guia.titulo || ''}
+                  onChange={(e) => editarGuia('titulo', e.target.value)}
+                  placeholder="Título de la obra o dinámica"
+                />
               </div>
-              {[['antes', 'Antes de la Obra'], ['durante', 'Durante la Obra'], ['despues', 'Después de la Obra']].map(([clave, titulo]) => (
-                <div className="form-group" key={clave}>
-                  <label htmlFor={`g-${clave}`}>{titulo}</label>
-                  <textarea id={`g-${clave}`} rows={4} value={guia.momentos?.[clave] || ''} onChange={(e) => editarMomento(clave, e.target.value)} />
-                </div>
-              ))}
-              <div className="form-group">
-                <label htmlFor="g-preguntas">Preguntas para el Diálogo (una por línea)</label>
-                <textarea id="g-preguntas" rows={4} value={preguntasTexto} onChange={(e) => setPreguntasTexto(e.target.value)} />
+              <div className="dc-guia-meta-chips">
+                <span className="dc-meta-chip">🎭 {form.tema || 'Convivencia escolar'}</span>
+                <span className="dc-meta-chip">👥 {form.edad} años</span>
+                <span className="dc-meta-chip">⏱️ {form.duracion} minutos</span>
+                <span className="dc-meta-chip-edit">✏️ Editable en tiempo real</span>
               </div>
-
-              <div className="dc-actions" style={{ margin: '12px 0' }}>
-                <button type="button" className="dc-btn primary" onClick={() => accion(() => guardarGuia({ claseId, sesion, guia: guiaFinal() }), 'Guía guardada en tu panel.')}>
-                  Guardar guía
-                </button>
-                <button type="button" className="dc-btn" onClick={() => window.print()}>Exportar a PDF</button>
-                {clase && plantillas.length > 0 && (
-                  <button
-                    type="button"
-                    className="dc-btn"
-                    onClick={() => accion(async () => { await asignarTareasSesion(clase.id, sesion) }, `Tareas de la sesión ${sesion} asignadas a ${clase.grade} ${clase.section}.`)}
-                  >
-                    Asignar a {clase.grade} {clase.section} las {plantillas.length} tareas de la sesión {sesion}
-                  </button>
-                )}
-              </div>
-              {sesionElegida && !plantillas.length && (
-                <p className="dc-muted">Esta sesión aún no tiene tareas definidas en el programa.</p>
-              )}
-
-              <section className="dc-block">
-                <h3>Salida al teatro (opcional)</h3>
-                <p className="dc-muted">
-                  La guía puede recomendar asistir a una obra. Si decides ir con tu clase, avisa aquí.
-                </p>
-                <div className="dc-form">
-                  <input value={salida.obra} onChange={(e) => setSalida({ ...salida, obra: e.target.value })} placeholder="Obra a la que asistirás" aria-label="Obra" />
-                  <input type="date" value={salida.fecha} onChange={(e) => setSalida({ ...salida, fecha: e.target.value })} aria-label="Fecha" />
-                  <input value={salida.nota} onChange={(e) => setSalida({ ...salida, nota: e.target.value })} placeholder="Nota (opcional)" aria-label="Nota" />
-                  <div>
-                    <button
-                      type="button"
-                      className="dc-btn primary"
-                      onClick={() => accion(() => registrarAviso({ claseId, ...salida }), 'Aviso registrado: irás a la función con tu clase.')}
-                    >
-                      Avisar que asistiré
-                    </button>
-                  </div>
-                </div>
-              </section>
             </div>
 
-            {/* Versión de solo lectura que es la que se imprime */}
+            {/* Objetivo Pedagógico */}
+            <div className="dc-card-section">
+              <div className="dc-section-title">
+                <span className="dc-section-icon">🎯</span>
+                <div>
+                  <h4>Objetivo Pedagógico</h4>
+                  <small>Alineado a las competencias del Currículo Nacional</small>
+                </div>
+              </div>
+              <textarea
+                className="dc-textarea-styled"
+                rows={2}
+                value={guia.objetivo || ''}
+                onChange={(e) => editarGuia('objetivo', e.target.value)}
+                placeholder="Objetivo pedagógico de la experiencia teatral"
+              />
+            </div>
+
+            {/* Materiales y Recursos */}
+            <div className="dc-card-section">
+              <div className="dc-section-title">
+                <span className="dc-section-icon">📦</span>
+                <div>
+                  <h4>Materiales y Espacio</h4>
+                  <small>Recursos requeridos en el aula o escenario</small>
+                </div>
+              </div>
+              <div className="dc-items-list">
+                {(guia.materiales || []).map((mat, idx) => (
+                  <div key={idx} className="dc-item-row">
+                    <span className="dc-bullet">•</span>
+                    <input
+                      className="dc-input-item"
+                      value={mat}
+                      onChange={(e) => {
+                        const nuevos = [...(guia.materiales || [])]
+                        nuevos[idx] = e.target.value
+                        editarGuia('materiales', nuevos)
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Personajes de la Dinámica */}
+            {guia.personajes && guia.personajes.length > 0 && (
+              <div className="dc-card-section">
+                <div className="dc-section-title">
+                  <span className="dc-section-icon">🎭</span>
+                  <div>
+                    <h4>Elenco y Personajes para Estudiantes</h4>
+                    <small>Roles diseñados para fomentar la empatía y la toma de perspectiva</small>
+                  </div>
+                </div>
+                <div className="dc-personajes-grid">
+                  {guia.personajes.map((p, idx) => (
+                    <div key={idx} className="dc-personaje-card">
+                      <div className="dc-personaje-badge">Rol #{idx + 1}</div>
+                      <input
+                        className="dc-personaje-nombre"
+                        value={p.nombre || ''}
+                        onChange={(e) => {
+                          const nuevos = [...guia.personajes]
+                          nuevos[idx] = { ...nuevos[idx], nombre: e.target.value }
+                          editarGuia('personajes', nuevos)
+                        }}
+                        placeholder="Nombre del personaje"
+                      />
+                      <textarea
+                        className="dc-personaje-desc"
+                        rows={3}
+                        value={p.descripcion || ''}
+                        onChange={(e) => {
+                          const nuevos = [...guia.personajes]
+                          nuevos[idx] = { ...nuevos[idx], descripcion: e.target.value }
+                          editarGuia('personajes', nuevos)
+                        }}
+                        placeholder="Descripción y conflicto del personaje"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Estructura Escénica: Momentos / Escenas */}
+            <div className="dc-card-section">
+              <div className="dc-section-title">
+                <span className="dc-section-icon">🎬</span>
+                <div>
+                  <h4>Estructura de la Dinámica Escénica</h4>
+                  <small>Secuencia dramática paso a paso adaptada al tiempo de clase</small>
+                </div>
+              </div>
+
+              {guia.escenas && guia.escenas.length > 0 ? (
+                <div className="dc-escenas-timeline">
+                  {guia.escenas.map((esc, idx) => (
+                    <div key={idx} className="dc-escena-item">
+                      <div className="dc-escena-num">{idx + 1}</div>
+                      <div className="dc-escena-content">
+                        <div className="dc-escena-header">
+                          <input
+                            className="dc-escena-titulo"
+                            value={esc.nombre || ''}
+                            onChange={(e) => {
+                              const nuevas = [...guia.escenas]
+                              nuevas[idx] = { ...nuevas[idx], nombre: e.target.value }
+                              editarGuia('escenas', nuevas)
+                            }}
+                            placeholder="Nombre del momento o escena"
+                          />
+                          <div className="dc-escena-minutos">
+                            <input
+                              type="number"
+                              className="dc-min-input"
+                              value={esc.duracion_minutos || 10}
+                              onChange={(e) => {
+                                const nuevas = [...guia.escenas]
+                                nuevas[idx] = { ...nuevas[idx], duracion_minutos: Number(e.target.value) }
+                                editarGuia('escenas', nuevas)
+                              }}
+                            />
+                            <span>min</span>
+                          </div>
+                        </div>
+                        <textarea
+                          className="dc-escena-instrucciones"
+                          rows={3}
+                          value={esc.instrucciones || ''}
+                          onChange={(e) => {
+                            const nuevas = [...guia.escenas]
+                            nuevas[idx] = { ...nuevas[idx], instrucciones: e.target.value }
+                            editarGuia('escenas', nuevas)
+                          }}
+                          placeholder="Instrucciones para los participantes y el docente"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="dc-momentos-fallback">
+                  {[['antes', '1. Antes de la Obra (Preparación)'], ['durante', '2. Durante la Obra (Experiencia)'], ['despues', '3. Después de la Obra (Reflexión)']].map(([clave, titulo]) => (
+                    <div className="form-group" key={clave} style={{ marginBottom: 14 }}>
+                      <label style={{ fontWeight: 600 }}>{titulo}</label>
+                      <textarea
+                        className="dc-textarea-styled"
+                        rows={3}
+                        value={guia.momentos?.[clave] || ''}
+                        onChange={(e) => editarMomento(clave, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Preguntas de Diálogo y Reflexión */}
+            <div className="dc-card-section">
+              <div className="dc-section-title">
+                <span className="dc-section-icon">💬</span>
+                <div>
+                  <h4>Preguntas para el Diálogo y Debate Guiado</h4>
+                  <small>Detonadores de empatía y pensamiento crítico para los estudiantes</small>
+                </div>
+              </div>
+              <div className="dc-preguntas-box">
+                <textarea
+                  className="dc-textarea-styled"
+                  rows={5}
+                  value={preguntasTexto}
+                  onChange={(e) => setPreguntasTexto(e.target.value)}
+                  placeholder="Escribe una pregunta por línea..."
+                />
+                <span className="dc-tip-badge">💡 Puedes agregar o editar preguntas (una por renglón)</span>
+              </div>
+            </div>
+
+            {/* Recomendaciones Pedagógicas para el Docente */}
+            {guia.recomendaciones_docente && guia.recomendaciones_docente.length > 0 && (
+              <div className="dc-card-section dc-recom-box">
+                <div className="dc-section-title">
+                  <span className="dc-section-icon">✨</span>
+                  <div>
+                    <h4>Recomendaciones para el Docente</h4>
+                    <small>Cuidado pedagógico, contención emocional y clima seguro</small>
+                  </div>
+                </div>
+                <div className="dc-recom-list">
+                  {guia.recomendaciones_docente.map((rec, idx) => (
+                    <div key={idx} className="dc-recom-item">
+                      <span className="dc-recom-check">✓</span>
+                      <textarea
+                        className="dc-input-item-auto"
+                        rows={2}
+                        value={rec}
+                        onChange={(e) => {
+                          const nuevas = [...guia.recomendaciones_docente]
+                          nuevas[idx] = e.target.value
+                          editarGuia('recomendaciones_docente', nuevas)
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Barra de Acciones del Docente */}
+            <div className="dc-footer-actions">
+              <button
+                type="button"
+                className="btn"
+                style={{ padding: '12px 28px', fontSize: '15px' }}
+                onClick={() => accion(() => guardarGuia({ claseId, sesion, guia: guiaFinal() }), '✓ ¡Guía pedagógica guardada con éxito!')}
+              >
+                💾 Guardar Guía Editada
+              </button>
+              <button type="button" className="btn btn-white" onClick={() => window.print()}>
+                📄 Exportar a PDF / Imprimir
+              </button>
+              {clase && plantillas.length > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-outline-light"
+                  style={{ color: 'var(--ink)', borderColor: 'var(--line)' }}
+                  onClick={() => accion(async () => { await asignarTareasSesion(clase.id, sesion) }, `✓ Tareas de la sesión ${sesion} asignadas a ${clase.grade} ${clase.section}.`)}
+                >
+                  Asignar a {clase.grade} {clase.section}
+                </button>
+              )}
+            </div>
+
+            {/* Versión para Impresión Limpia */}
             <div className="dc-print-only">
               <h1>{guia.titulo || 'Guía pedagógica'}</h1>
               {clase && <p>{clase.grade} {clase.section} · {clase.subject}</p>}
-              {guia.introduccion && <p>{guia.introduccion}</p>}
-              {[['antes', 'Antes de la Obra'], ['durante', 'Durante la Obra'], ['despues', 'Después de la Obra']].map(([clave, titulo]) => (
-                guia.momentos?.[clave] ? <div key={clave}><h2>{titulo}</h2><p>{guia.momentos[clave]}</p></div> : null
+              <p><strong>Objetivo:</strong> {guia.objetivo}</p>
+              <h2>Estructura de la Experiencia</h2>
+              {(guia.escenas || []).map((e, idx) => (
+                <div key={idx} style={{ marginBottom: 12 }}>
+                  <h3>{idx + 1}. {e.nombre} ({e.duracion_minutos} min)</h3>
+                  <p>{e.instrucciones}</p>
+                </div>
               ))}
-              {guiaFinal().preguntas_debate.length > 0 && (
-                <>
-                  <h2>Preguntas para el Diálogo</h2>
-                  <ul>{guiaFinal().preguntas_debate.map((p, i) => <li key={i}>{p}</li>)}</ul>
-                </>
-              )}
+              <h2>Preguntas para el Diálogo</h2>
+              <ul>
+                {preguntasTexto.split('\n').filter(Boolean).map((q, i) => (
+                  <li key={i}>{q}</li>
+                ))}
+              </ul>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
