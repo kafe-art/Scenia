@@ -91,6 +91,7 @@ sqlite3 backend/scenia.db < database/seeds/test_data.sql
 
 ## 📚 Documentación Adicional
 
+- [Guía de Trabajo en Equipo y Ramas (5 Integrantes)](docs/guia-equipo-ramas.md)
 - [Requisitos del Sistema](docs/requisitos.md)
 - [Contratos y Especificación de la API](docs/contratos_api.md)
 - [Arquitectura del Sistema](docs/arquitectura.md)

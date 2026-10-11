@@ -7,3 +7,4 @@ Este directorio centraliza la documentación funcional, técnica y de contratos 
 - [Requisitos del Sistema](requisitos.md): Requisitos funcionales y no funcionales del sistema.
 - [Contratos de API](contratos_api.md): Especificaciones de endpoints, formatos de petición y respuesta.
 - [Arquitectura](arquitectura.md): Diagrama y descripción de la arquitectura del proyecto.
+- [Guía de Trabajo en Equipo y Ramas](guia-equipo-ramas.md): Flujo de Git y organización modular para el equipo de 5 personas.
