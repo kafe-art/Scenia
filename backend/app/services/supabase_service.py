@@ -1,6 +1,9 @@
 import os
-
+from dotenv import load_dotenv
 from supabase import create_client, Client
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
@@ -67,4 +70,3 @@ def obtener_actividades():
         .execute()
     )
     return resultado.data
-
