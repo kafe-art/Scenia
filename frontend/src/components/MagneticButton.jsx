@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 
 export default function MagneticButton({
@@ -10,6 +11,7 @@ export default function MagneticButton({
   glow = true,
 }) {
   const ref = useRef(null)
+  const navigate = useNavigate()
   const [coords, setCoords] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
   const prefersReduced = useReducedMotion()
@@ -56,6 +58,22 @@ export default function MagneticButton({
   )
 
   if (href) {
+    // Si es una ruta interna de la SPA, usamos navegación cliente sin recargar la página
+    if (href.startsWith('/') && !href.startsWith('//')) {
+      return (
+        <motion.button
+          type="button"
+          onClick={(e) => {
+            if (onClick) onClick(e)
+            navigate(href)
+          }}
+          {...motionProps}
+        >
+          {innerContent}
+        </motion.button>
+      )
+    }
+
     return (
       <motion.a href={href} {...motionProps}>
         {innerContent}
