@@ -4,14 +4,19 @@ export async function fetchAPI(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`
 
   const config = {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
-    ...options,
   }
 
-  const response = await fetch(url, config)
+  let response
+  try {
+    response = await fetch(url, config)
+  } catch {
+    throw new Error('No pudimos conectar con el servidor. Comprueba que el backend esté disponible e inténtalo de nuevo.')
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))

@@ -1,13 +1,16 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { PageHeading } from '../components/SceniaUI'
 import { generarGuia } from '../services/guias'
 import Loading from '../components/Loading'
 import ErrorMessage from '../components/ErrorMessage'
 
 function Docente() {
+  const [params] = useSearchParams()
   const [form, setForm] = useState({
-    tema: '',
-    objetivo: '',
-    edad: 12,
+    tema: params.get('tema') || '',
+    objetivo: params.get('objetivo') || '',
+    edad: Number(params.get('edad')) || 14,
     duracion: 30,
   })
   const [guia, setGuia] = useState(null)
@@ -40,8 +43,8 @@ function Docente() {
 
   return (
     <div className="page">
-      <h2>Vista Docente</h2>
-      <p>Genera una guía teatral para tu actividad de convivencia escolar.</p>
+      <PageHeading eyebrow="TU ASISTENTE PEDAGÓGICO" title="Haz que tu próxima clase cobre vida.">Prepara una propuesta teatral y revísala antes de llevarla al aula.</PageHeading>
+      <p className="service-note">Este formulario utiliza tu backend y Gemini. La respuesta es una propuesta para revisión docente.</p>
 
       <form onSubmit={handleSubmit} className="form">
         <label>
@@ -75,7 +78,7 @@ function Docente() {
               name="edad"
               value={form.edad}
               onChange={handleChange}
-              min={6}
+              min={12}
               max={18}
               required
             />
