@@ -28,10 +28,10 @@ def esta_conectado():
 
 
 def guardar_guia(guia_data):
-    """Guarda una guía generada en la tabla 'guias'."""
+    """Guarda una guía generada en la tabla 'guias_pedagogicas'."""
     if supabase is None:
         return None
-    resultado = supabase.table("guias").insert(guia_data).execute()
+    resultado = supabase.table("guias_pedagogicas").insert(guia_data).execute()
     return resultado.data
 
 
