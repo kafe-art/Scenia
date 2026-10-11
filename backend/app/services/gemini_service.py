@@ -3,9 +3,12 @@ import logging
 import os
 import time
 
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from google.genai.errors import ServerError
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +16,20 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Modelo principal y modelos de respaldo (menos demandados, más estables)
 MODELOS = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
+    "gemini-3.8-flash",
 ]
 
 MAX_REINTENTOS = 3
 PAUSA_ENTRE_REINTENTOS = 2  # segundos
 
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+client = (
+    genai.Client(
+        api_key=GEMINI_API_KEY,
+        http_options=types.HttpOptions(timeout=25000)
+    )
+    if GEMINI_API_KEY
+    else None
+)
 
 
 # ── Respuestas precargadas para que la demo NUNCA falle ──────────────
@@ -182,14 +190,13 @@ def _llamar_gemini(instrucciones, temperature, max_tokens):
                 )
                 time.sleep(PAUSA_ENTRE_REINTENTOS)
 
-            except json.JSONDecodeError as e:
+            except Exception as e:
                 ultimo_error = e
                 logger.warning(
-                    "Gemini %s devolvió JSON inválido. "
-                    "Probando siguiente modelo...",
-                    modelo,
+                    "Error al llamar a Gemini %s: %s",
+                    modelo, e,
                 )
-                break  # No reintentar JSON inválido, probar otro modelo
+                break
 
         logger.warning(
             "Modelo %s agotó reintentos. Probando siguiente modelo...",
@@ -201,10 +208,11 @@ def _llamar_gemini(instrucciones, temperature, max_tokens):
 
 
 def generar_guia(tema, objetivo, edad, duracion):
-    """Genera una guía teatral. Si Gemini falla, devuelve respuesta
-    precargada para que la demo nunca se caiga."""
+    """Genera una guía teatral. Si Gemini falla o no está configurado,
+    devuelve respuesta precargada para que la demo nunca se caiga."""
     if client is None:
-        raise RuntimeError("Gemini no está configurado en el servidor.")
+        logger.warning("Gemini no configurado. Usando respuesta precargada.")
+        return GUIA_PRECARGADA
 
     instrucciones = f"""
     Eres un asistente de diseño pedagógico especializado en teatro
@@ -262,10 +270,11 @@ def generar_guia(tema, objetivo, edad, duracion):
 
 
 def analizar_reflexion(reflexion):
-    """Analiza una reflexión. Si Gemini falla, devuelve análisis
-    precargado para que la demo nunca se caiga."""
+    """Analiza una reflexión. Si Gemini falla o no está configurado,
+    devuelve análisis precargado para que la demo nunca se caiga."""
     if client is None:
-        raise RuntimeError("Gemini no está configurado en el servidor.")
+        logger.warning("Gemini no configurado. Usando análisis precargado.")
+        return ANALISIS_PRECARGADO
 
     instrucciones = f"""
     Analiza esta reflexión escrita después de una actividad teatral
