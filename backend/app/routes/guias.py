@@ -50,6 +50,7 @@ def post_generar_guia():
         if esta_conectado():
             try:
                 guia_a_guardar = {
+                    "id_curso": 1,
                     "tema_didactico": tema,
                     "contenido": json.dumps(guia),
                     "estado": "PUBLISHED"
