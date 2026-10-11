@@ -22,7 +22,14 @@ MODELOS = [
 MAX_REINTENTOS = 3
 PAUSA_ENTRE_REINTENTOS = 2  # segundos
 
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+client = (
+    genai.Client(
+        api_key=GEMINI_API_KEY,
+        http_options=types.HttpOptions(timeout=25000)
+    )
+    if GEMINI_API_KEY
+    else None
+)
 
 
 # ── Respuestas precargadas para que la demo NUNCA falle ──────────────

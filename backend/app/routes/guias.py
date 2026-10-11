@@ -48,20 +48,21 @@ def post_generar_guia():
 
         # 2. Guardar en Supabase si la conexión está activa
         if esta_conectado():
-            guia_a_guardar = {
-                "id_curso": 1,
-                "id_docente_creador": 1,
-                "tema_didactico": tema,
-                "competencia_cneb": guia.get("competencia", "Se desenvuelve a través de su creatividad"),
-                "contenido": json.dumps(guia),
-                "estado": "PUBLISHED"
-            }
-            
             try:
-                resultado_db = guardar_guia(guia_a_guardar)
-                logger.info("Guía pedagógica guardada en Supabase con éxito: %s", resultado_db)
+                guia_a_guardar = {
+                    "tema_didactico": tema,
+                    "contenido": json.dumps(guia),
+                    "estado": "PUBLISHED"
+                }
+                guardar_guia(guia_a_guardar)
             except Exception as db_err:
-                print("❌ ERROR EXACTO AL GUARDAR EN SUPABASE:", db_err)
+                logger.warning("Error al guardar en Supabase (no crítico): %s", db_err)
+
+        # Retornar la guía al frontend exitosamente
+        return jsonify({
+            "ok": True,
+            "guia": guia
+        })
 
     except json.JSONDecodeError:
         logger.exception(
@@ -75,7 +76,7 @@ def post_generar_guia():
         return jsonify({"error": str(e)}), 503
 
     except Exception:
-        logger.exception("Error generando o guardando la guía.")
+        logger.exception("Error generando la guía.")
         return jsonify({
             "error": "No se pudo generar la guía en este momento."
         }), 502
