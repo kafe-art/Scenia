@@ -4,6 +4,7 @@ import logging
 from flask import Blueprint, jsonify, request
 
 from app.services.gemini_service import generar_guia
+from app.services.supabase_service import guardar_guia, esta_conectado
 
 guias_bp = Blueprint("guias", __name__)
 logger = logging.getLogger(__name__)
@@ -42,7 +43,26 @@ def post_generar_guia():
         }), 400
 
     try:
+        # 1. Generar la estructura de la guía con Gemini
         guia = generar_guia(tema, objetivo, edad, duracion)
+
+        # 2. Guardar en Supabase si la conexión está activa
+        if esta_conectado():
+            # Usamos los IDs '1' que acabamos de crear en las tablas base
+            guia_a_guardar = {
+                "id_curso": 1,
+                "id_docente_creador": 1,
+                "tema_didactico": tema,
+                "competencia_cneb": guia.get("competencia", "Se desenvuelve a través de su creatividad"),
+                "contenido_momento_pre": json.dumps(guia.get("momento_pre", {})),
+                "contenido_momento_durante": json.dumps(guia.get("momento_durante", {})),
+                "contenido_momento_post": json.dumps(guia.get("momento_post", {})),
+                "estado": "PUBLISHED"
+            }
+            
+            resultado_db = guardar_guia(guia_a_guardar)
+            logger.info("Guía pedagógica guardada en Supabase con éxito: %s", resultado_db)
+
         return jsonify({"ok": True, "guia": guia})
 
     except json.JSONDecodeError:
@@ -57,8 +77,7 @@ def post_generar_guia():
         return jsonify({"error": str(e)}), 503
 
     except Exception:
-        logger.exception("Error generando la guía con Gemini.")
+        logger.exception("Error generando o guardando la guía.")
         return jsonify({
             "error": "No se pudo generar la guía en este momento."
         }), 502
-
