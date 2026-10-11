@@ -1,404 +1,206 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Icon } from '../../../components/SceniaUI'
+import { Icon, PageHeading } from '../../../components/SceniaUI'
 import Loading from '../../../components/Loading'
-import {
-  listarClases,
-  obtenerActividadesProximas,
-  obtenerObrasRecomendadasParaClase,
-  vincularObraAClase,
-  actualizarInteresesClase,
-} from '../services/clases'
-import CrearCursoModal from '../components/CrearCursoModal'
+import { SESIONES } from '../data/programa'
+import { listarAvisos, listarClases, listarGuias } from '../services/clases'
 
-export default function InicioDocente() {
+const nombreClase = (lista, id) => {
+  const c = lista.find((x) => x.id === id)
+  return c ? `${c.grade} ${c.section}` : 'Sin clase'
+}
+
+export function ClassCard({ item }) {
+  const r = item.resumen
+  const estudiantes = r ? r.estudiantes : item.students
+  const hechas = r ? r.hechas : item.completed
+  const total = r ? r.posibles : item.total
+  return (
+    <article className="class-card">
+      <div className={`class-art ${item.color}`}>
+        <span className="art-shape one" />
+        <span className="art-shape two" />
+        <span className="art-grid" />
+        <div>
+          <span className="class-grade">{item.grade} SECUNDARIA</span>
+          <p>{item.subject}</p>
+        </div>
+      </div>
+      <div className="class-info">
+        <div className="between">
+          <h3>Sección {item.section}</h3>
+          <span className={`badge ${item.color}`}>{item.guides} guías</span>
+        </div>
+        <p className="class-meta">
+          <Icon name="users" size={16} /> {estudiantes} estudiantes · Turno {item.shift.toLowerCase()}
+        </p>
+        <div className="last-guide">
+          <small>ÚLTIMA GUÍA · EJEMPLO</small>
+          <strong>{item.last}</strong>
+        </div>
+        <div className="progress-label">
+          <span>Entregas de la actividad</span>
+          <strong>{hechas}/{total}</strong>
+        </div>
+        <progress
+          max={total || 1}
+          value={hechas}
+          aria-label={`${hechas} de ${total} entregas hechas`}
+        />
+        <Link className="card-action" to={`/docente/clases/${item.id}`}>
+          Abrir clase <Icon size={18} />
+        </Link>
+      </div>
+    </article>
+  )
+}
+
+export default function InicioDocente({ allClasses = false }) {
   const [classes, setClasses] = useState(null)
-  const [actividades, setActividades] = useState([])
-  const [selectedClassId, setSelectedClassId] = useState('')
-  const [modalCrearCurso, setModalCrearCurso] = useState(false)
-  const [modalIntereses, setModalIntereses] = useState(false)
-  const [interesesForm, setInteresesForm] = useState({ topic: '', intereses: '' })
-  const [toast, setToast] = useState(null)
-
-  const showToast = (message) => {
-    setToast(message)
-    setTimeout(() => setToast(null), 4000)
-  }
-
-  const cargarDatos = () => {
-    Promise.all([listarClases(), obtenerActividadesProximas()]).then(([listaClases, listaActividades]) => {
-      setClasses(listaClases)
-      setActividades(listaActividades)
-      if (listaClases && listaClases.length > 0) {
-        const activa = listaClases.find((c) => c.activa) || listaClases[0]
-        setSelectedClassId((prev) => (prev && listaClases.some((c) => c.id === prev) ? prev : activa.id))
-      }
-    })
-  }
+  const [guias, setGuias] = useState([])
+  const [avisos, setAvisos] = useState([])
 
   useEffect(() => {
-    let cancelado = false
-    Promise.all([listarClases(), obtenerActividadesProximas()]).then(([listaClases, listaActividades]) => {
-      if (cancelado) return
-      setClasses(listaClases)
-      setActividades(listaActividades)
-      if (listaClases && listaClases.length > 0) {
-        const activa = listaClases.find((c) => c.activa) || listaClases[0]
-        setSelectedClassId((prev) => (prev && listaClases.some((c) => c.id === prev) ? prev : activa.id))
-      }
+    Promise.all([listarClases(), listarGuias(), listarAvisos()]).then(([c, g, a]) => {
+      setClasses(c)
+      setGuias(g)
+      setAvisos(a)
     })
-    return () => {
-      cancelado = true
-    }
   }, [])
 
-  if (!classes) return <Loading mensaje="Cargando tu panel docente..." />
+  if (!classes) return <Loading mensaje="Cargando tus clases..." />
 
-  const selectedClass = classes.find((c) => c.id === selectedClassId) || classes[0]
-  const obrasRecomendadas = obtenerObrasRecomendadasParaClase(selectedClass)
-
-  const handleCursoCreado = (nuevas) => {
-    cargarDatos()
-    const plural = nuevas.length > 1 ? `las secciones ${nuevas.map((n) => n.section).join(', ')}` : `la sección ${nuevas[0]?.section || 'A'}`
-    showToast(`¡Se ha creado ${nuevas[0]?.subject || 'el curso'} con ${plural}!`)
-  }
-
-  const handleAbrirEditarIntereses = () => {
-    if (!selectedClass) return
-    setInteresesForm({
-      topic: selectedClass.topic || '',
-      intereses: selectedClass.intereses || '',
-    })
-    setModalIntereses(true)
-  }
-
-  const handleGuardarIntereses = async (e) => {
-    e.preventDefault()
-    if (!selectedClass) return
-    try {
-      await actualizarInteresesClase(selectedClass.id, interesesForm)
-      await cargarDatos()
-      setModalIntereses(false)
-      showToast(`¡Intereses y tema de ${selectedClass.subject} ${selectedClass.section} actualizados!`)
-    } catch {
-      showToast('Error al guardar los intereses.')
-    }
-  }
-
-  const handleAnadirAlCurso = async (obra) => {
-    if (!selectedClass) return
-    try {
-      await vincularObraAClase(selectedClass.id, obra.titulo)
-      await cargarDatos()
-      showToast(`¡"${obra.titulo}" fue añadida al curso ${selectedClass.subject} ${selectedClass.section}!`)
-    } catch {
-      showToast('No se pudo vincular la obra al curso.')
-    }
-  }
+  const totales = classes.reduce(
+    (acc, c) => ({
+      estudiantes: acc.estudiantes + c.resumen.estudiantes,
+      sinConsentimiento: acc.sinConsentimiento + c.resumen.sinConsentimiento,
+      porRevisar: acc.porRevisar + c.resumen.porRevisar,
+    }),
+    { estudiantes: 0, sinConsentimiento: 0, porRevisar: 0 },
+  )
 
   return (
-    <div className="dc-docente-dashboard">
-      {/* Toast Notification Flotante */}
-      {toast && (
-        <div className="dc-floating-toast" role="alert">
-          <Icon name="check" size={16} />
-          <span>{toast}</span>
-        </div>
+    <>
+      {!allClasses && (
+        <section className="teacher-banner">
+          <span className="avatar large">CM</span>
+          <div>
+            <span className="profile-label">PERFIL DOCENTE · DEMOSTRACIÓN</span>
+            <h1>Carla Mendoza</h1>
+            <p>Comunicación · Secundaria <span>•</span> I.E. de ejemplo</p>
+          </div>
+          <div className="teacher-banner-right">
+            <span>UN NUEVO DÍA PARA INSPIRAR</span>
+            <Link to="/cartelera">Explorar cartelera <Icon /></Link>
+          </div>
+        </section>
       )}
 
-      {/* 1. Header de Bienvenida */}
-      <header className="dc-dashboard-welcome">
-        <div>
-          <span className="dc-welcome-eyebrow">PANEL DOCENTE</span>
-          <h1 className="dc-welcome-title">Buenos días, Carla</h1>
-          <p className="dc-welcome-subtitle">
-            Organiza tus cursos y acompaña cada experiencia teatral desde un solo lugar.
-          </p>
-        </div>
-        <button
-          type="button"
-          className="dc-btn-primary-action"
-          onClick={() => setModalCrearCurso(true)}
-        >
-          <Icon name="plus" size={16} />
-          <span>Crear curso</span>
-        </button>
-      </header>
+      <PageHeading
+        eyebrow="TUS AULAS"
+        title={allClasses ? 'Mis clases' : 'Cada clase, una nueva historia.'}
+        action={
+          <Link className="btn" to="/docente/guias/nueva">
+            <Icon name="plus" /> Nueva guía
+          </Link>
+        }
+      >
+        Selecciona una clase para ver sus actividades y preparar tu próxima experiencia.
+      </PageHeading>
 
-      {/* 2. Sección: Mis cursos y secciones */}
-      <section className="dc-courses-section">
-        <div className="dc-section-title-group">
-          <h2 className="dc-section-title">Mis cursos y secciones</h2>
-          <p className="dc-section-subtitle">Continúa desde donde lo dejaste.</p>
-        </div>
+      <div className="class-grid">
+        {classes.map((item) => (
+          <ClassCard key={item.id} item={item} />
+        ))}
+      </div>
 
-        <div className="dc-courses-grid">
-          {classes.map((curso) => {
-            const numEstudiantes = curso.resumen?.estudiantes ?? curso.students ?? 25
-            const temaActual = curso.topic || 'Convivencia escolar'
-            const proximoTexto = curso.proximo || 'Revisar reflexiones'
-            const esActiva = Boolean(curso.activa)
-
-            return (
-              <article
-                key={curso.id}
-                className={`dc-course-card ${esActiva ? 'is-active-section' : ''}`}
-              >
-                {/* Cabecera de la tarjeta */}
-                <div className="dc-card-top-bar">
-                  <div className="dc-course-icon-badge">
-                    <Icon name="book" size={18} />
-                  </div>
-                  {esActiva && (
-                    <span className="dc-active-badge">Sección activa</span>
-                  )}
+      {!allClasses && (
+        <>
+          <div className="overview-grid">
+            {[
+              [String(classes.length), 'Clases a tu cargo', 'book', '/docente/clases'],
+              [String(totales.estudiantes), 'Estudiantes inscritos', 'users', '/docente/clases'],
+              [String(totales.porRevisar), 'Entregas por revisar', 'calendar', '/docente/clases'],
+              [String(guias.length), 'Guías IA guardadas', 'spark', '/docente/guias/nueva'],
+            ].map(([n, l, i, to]) => (
+              <Link className="overview-card" key={l} to={to}>
+                <span className={`metric-icon ${i}`}><Icon name={i} /></span>
+                <div>
+                  <strong>{n}</strong>
+                  <p>{l}</p>
                 </div>
-
-                {/* Título y Grado/Sección */}
-                <div className="dc-card-title-block">
-                  <h3 className="dc-card-subject">{curso.subject}</h3>
-                  <p className="dc-card-grade-sec">
-                    {curso.grade} de secundaria · Sección {curso.section}
-                  </p>
-                </div>
-
-                {/* Métricas clave */}
-                <div className="dc-card-metrics-grid">
-                  <div className="dc-metric-col">
-                    <span className="dc-metric-label">ESTUDIANTES</span>
-                    <strong className="dc-metric-value">{numEstudiantes}</strong>
-                  </div>
-                  <div className="dc-metric-col">
-                    <span className="dc-metric-label">TEMA ACTUAL</span>
-                    <strong className="dc-metric-value topic-text">{temaActual}</strong>
-                  </div>
-                </div>
-
-                <div className="dc-card-divider" />
-
-                {/* Alerta de próximo pendiente */}
-                <div className="dc-card-next-alert">
-                  <Icon name="clock" size={14} />
-                  <span>
-                    <strong>Próximo:</strong> {proximoTexto}
-                  </span>
-                </div>
-
-                {/* Botón de acción */}
-                <Link
-                  to={`/docente/clases/${curso.id}`}
-                  className="dc-card-open-btn"
-                >
-                  <span>Abrir curso</span>
-                  <span className="dc-btn-arrow">→</span>
-                </Link>
-              </article>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* 3. Bloque Inferior: Próximas actividades y Obras para tu sección */}
-      <div className="dc-dashboard-lower-grid">
-        {/* Columna Izquierda: Próximas actividades */}
-        <section className="dc-lower-col-left">
-          <div className="dc-section-title-group">
-            <h2 className="dc-section-title">Próximas actividades</h2>
-            <p className="dc-section-subtitle">Prioridades de tus secciones.</p>
+                <Icon size={16} />
+              </Link>
+            ))}
           </div>
 
-          <div className="dc-activities-card-list">
-            {actividades.map((act) => {
-              const bgIconClass =
-                act.color === 'rose'
-                  ? 'bg-rose-50 text-rose-500'
-                  : act.color === 'amber'
-                    ? 'bg-amber-50 text-amber-500'
-                    : 'bg-indigo-50 text-indigo-600'
-
+          <section className="surface" style={{ margin: '24px 0' }}>
+            <span className="eyebrow">VOCES QUE TRANSFORMAN</span>
+            <h2>Avance del programa por clase</h2>
+            {totales.sinConsentimiento > 0 && (
+              <p className="inline-message">
+                {totales.sinConsentimiento} estudiante(s) aún sin consentimiento: no podrán recibir tareas.
+              </p>
+            )}
+            {classes.map((c) => {
+              const proxima = SESIONES.find((s) => !c.sesionesDictadas.includes(s.n))?.n
               return (
-                <div key={act.id} className="dc-activity-item-row">
-                  <div className={`dc-activity-icon ${bgIconClass}`}>
-                    <Icon name={act.icono || 'ticket'} size={18} />
-                  </div>
-                  <div className="dc-activity-info">
-                    <h4 className="dc-activity-item-title">{act.titulo}</h4>
-                    <p className="dc-activity-item-sub">{act.subtitulo}</p>
-                  </div>
-                  <div className="dc-activity-meta-right">
-                    {act.fechaTexto && (
-                      <span className="dc-activity-date-pill">{act.fechaTexto}</span>
-                    )}
-                    {act.badge && (
-                      <span className="dc-activity-count-badge">{act.badge}</span>
-                    )}
+                <div className="dc-row" key={c.id}>
+                  <Link to={`/docente/clases/${c.id}`}>{c.grade} {c.section} · {c.subject}</Link>
+                  <div className="dc-dots" aria-label={`${c.resumen.sesionesDictadas} de 6 sesiones dictadas`}>
+                    {SESIONES.map((s) => (
+                      <span key={s.n} className={`dc-dot ${c.sesionesDictadas.includes(s.n) ? 'hecha' : s.n === proxima ? 'proxima' : ''}`}>{s.n}</span>
+                    ))}
                   </div>
                 </div>
               )
             })}
-          </div>
-        </section>
+          </section>
 
-        {/* Columna Derecha: Obras para tu sección */}
-        <section className="dc-lower-col-right">
-          <div className="dc-recommendations-header-row">
+          {(guias.length > 0 || avisos.length > 0) && (
+            <section className="surface" style={{ margin: '24px 0' }}>
+              {guias.length > 0 && (
+                <>
+                  <span className="eyebrow">GUÍAS RECIENTES</span>
+                  {guias.slice(0, 3).map((g) => (
+                    <div className="dc-row" key={g.id}>
+                      <strong>{g.guia.titulo || 'Guía sin título'}</strong>
+                      <span className="dc-muted">{nombreClase(classes, g.claseId)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {avisos.length > 0 && (
+                <>
+                  <span className="eyebrow" style={{ display: 'block', marginTop: 16 }}>SALIDAS AL TEATRO AVISADAS</span>
+                  {avisos.slice(0, 3).map((a) => (
+                    <div className="dc-row" key={a.id}>
+                      <strong>{a.obra}</strong>
+                      <span className="dc-muted">{a.fecha || 'Fecha por definir'}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </section>
+          )}
+
+          <section className="teacher-feature">
             <div>
-              <h2 className="dc-section-title">Obras para tu sección</h2>
-              <p className="dc-recommendations-topic-sub">
-                Tema actual: <strong>{selectedClass?.topic || 'Convivencia escolar'}</strong> ·{' '}
-                <button
-                  type="button"
-                  className="dc-link-edit-interests"
-                  onClick={handleAbrirEditarIntereses}
-                >
-                  Editar intereses
-                </button>
-              </p>
+              <span className="eyebrow">DEL AULA AL ESCENARIO</span>
+              <h2>Una historia puede abrir<br />una gran conversación.</h2>
+              <p>Encuentra una obra y prepara una guía para tu clase.</p>
+              <Link className="text-link" to="/cartelera">
+                Descubrir historias <Icon />
+              </Link>
             </div>
-
-            {/* Selector de clase/sección */}
-            <div className="dc-section-select-wrapper">
-              <select
-                className="dc-section-select"
-                value={selectedClassId}
-                onChange={(e) => setSelectedClassId(e.target.value)}
-                aria-label="Seleccionar sección"
-              >
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.subject} · {c.grade} {c.section}
-                  </option>
-                ))}
-              </select>
+            <div className="feature-quote">
+              <span aria-hidden="true">“</span>
+              <p>El teatro es un lugar<br />para encontrarnos.</p>
+              <small>VOCES QUE TRANSFORMAN</small>
             </div>
-          </div>
-
-          {/* Lista de tarjetas de obras recomendadas */}
-          <div className="dc-recommended-plays-list">
-            {obrasRecomendadas.map((obra) => (
-              <article key={obra.id} className="dc-play-recommendation-card">
-                {/* Poster con degradado y máscara teatral */}
-                <div
-                  className="dc-play-poster-thumb"
-                  style={{ background: obra.gradiente }}
-                >
-                  <div className="dc-theater-mask-icon">
-                    <Icon name="mask" size={28} />
-                  </div>
-                </div>
-
-                {/* Contenido descriptivo */}
-                <div className="dc-play-details-col">
-                  <span className="dc-play-tag-pill">{obra.tematica}</span>
-                  <h3 className="dc-play-item-title">{obra.titulo}</h3>
-                  <p className="dc-play-why-recommended">
-                    <strong>Por qué te la recomendamos:</strong> {obra.justificacion}
-                  </p>
-
-                  <div className="dc-play-actions-row">
-                    <Link
-                      to={`/docente/cartelera?obra=${obra.id}`}
-                      className="dc-link-view-play"
-                    >
-                      Ver obra y funciones →
-                    </Link>
-                    <button
-                      type="button"
-                      className="dc-btn-add-to-course"
-                      onClick={() => handleAnadirAlCurso(obra)}
-                    >
-                      + Añadir al curso
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="dc-view-all-recs-wrap">
-            <Link to="/docente/cartelera" className="dc-link-all-recs">
-              Ver todas las recomendaciones →
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      {/* Modal Multi-paso para Crear curso y secciones */}
-      <CrearCursoModal
-        isOpen={modalCrearCurso}
-        onClose={() => setModalCrearCurso(false)}
-        onCursoCreado={handleCursoCreado}
-      />
-
-      {/* Modal rápido: Editar intereses del aula */}
-      {modalIntereses && (
-        <div
-          className="dc-modal-overlay"
-          onClick={() => setModalIntereses(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="dc-modal-card compact" onClick={(e) => e.stopPropagation()}>
-            <div className="dc-modal-header">
-              <div>
-                <span className="dc-modal-tag">ENFOQUE PEDAGÓGICO</span>
-                <h3 className="dc-modal-title">
-                  Editar intereses · {selectedClass?.subject} {selectedClass?.grade}{' '}
-                  {selectedClass?.section}
-                </h3>
-              </div>
-              <button
-                type="button"
-                className="dc-modal-close-btn"
-                onClick={() => setModalIntereses(false)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleGuardarIntereses} className="dc-edit-interests-form">
-              <div className="dc-form-group">
-                <label className="dc-form-label">Tema actual del aula</label>
-                <input
-                  type="text"
-                  className="dc-form-input"
-                  value={interesesForm.topic}
-                  onChange={(e) =>
-                    setInteresesForm((prev) => ({ ...prev, topic: e.target.value }))
-                  }
-                  required
-                />
-              </div>
-
-              <div className="dc-form-group">
-                <label className="dc-form-label">Intereses y dinámicas de la sección</label>
-                <textarea
-                  className="dc-form-textarea"
-                  rows={3}
-                  value={interesesForm.intereses}
-                  onChange={(e) =>
-                    setInteresesForm((prev) => ({ ...prev, intereses: e.target.value }))
-                  }
-                  placeholder="ej. Debate, creación audiovisual, escucha activa..."
-                />
-              </div>
-
-              <div className="dc-modal-footer is-between">
-                <button
-                  type="button"
-                  className="dc-btn-link"
-                  onClick={() => setModalIntereses(false)}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="dc-btn-red">
-                  Guardar cambios
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+          </section>
+        </>
       )}
-    </div>
+    </>
   )
 }

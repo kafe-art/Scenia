@@ -1,23 +1,14 @@
 export default {
   id: 'admin',
   prefix: '/admin',
-  label: 'Colegio',
-  initials: 'SM',
-  demoName: 'San Miguel',
-  demoSubtitle: 'Colegio',
-  institution: 'I.E. Emblemática San Miguel de Piura',
-  sidebarCaption: 'GESTIÓN CULTURAL',
+  label: 'Administrador',
+  initials: 'CL',
+  demoName: 'Coordinador del Club',
   navigation: [
-    ['/admin', 'Panel institucional', 'chart'],
-  ],
-  sidebarCard: {
-    title: 'Voces que Transforman',
-    description: 'Metodología para escuchar, crear y reflexionar a través del teatro.',
-    to: '/admin/programa',
-    icon: 'spark',
-  },
-  bottomLinks: [
-    ['/admin/perfil', 'Mi perfil', 'user'],
-    ['/ingresar', 'Cerrar sesión', 'logout'],
+    ['/admin', 'Instituciones Aliadas', 'building'],
+    ['/admin/usuarios', 'Usuarios y Roles', 'users'],
+    ['/admin/metricas', 'Métricas e Impacto', 'chart'],
+    ['/admin/configuracion', 'Configuración del Sistema', 'settings'],
+    ['/admin/auditoria', 'Auditoría y Seguridad', 'shield'],
   ],
 }

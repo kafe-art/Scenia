@@ -43,28 +43,27 @@ def post_generar_guia():
         }), 400
 
     try:
-        # 1. Generar la estructura completa de la guía con Gemini
+        # 1. Generar la estructura de la guía con Gemini
         guia = generar_guia(tema, objetivo, edad, duracion)
 
         # 2. Guardar en Supabase si la conexión está activa
         if esta_conectado():
-            try:
-                guia_a_guardar = {
-                    "id_curso": 1,
-                    "id_docente_creador": 1,
-                    "tema_didactico": tema,
-                    "contenido": json.dumps(guia),
-                    "estado": "PUBLISHED"
-                }
-                guardar_guia(guia_a_guardar)
-            except Exception as db_err:
-                logger.warning("Error al guardar en Supabase (no crítico): %s", db_err)
+            # Usamos los IDs '1' que acabamos de crear en las tablas base
+            guia_a_guardar = {
+                "id_curso": 1,
+                "id_docente_creador": 1,
+                "tema_didactico": tema,
+                "competencia_cneb": guia.get("competencia", "Se desenvuelve a través de su creatividad"),
+                "contenido_momento_pre": json.dumps(guia.get("momento_pre", {})),
+                "contenido_momento_durante": json.dumps(guia.get("momento_durante", {})),
+                "contenido_momento_post": json.dumps(guia.get("momento_post", {})),
+                "estado": "PUBLISHED"
+            }
+            
+            resultado_db = guardar_guia(guia_a_guardar)
+            logger.info("Guía pedagógica guardada en Supabase con éxito: %s", resultado_db)
 
-        # Retornar la guía al frontend exitosamente
-        return jsonify({
-            "ok": True,
-            "guia": guia
-        })
+        return jsonify({"ok": True, "guia": guia})
 
     except json.JSONDecodeError:
         logger.exception(
@@ -78,7 +77,7 @@ def post_generar_guia():
         return jsonify({"error": str(e)}), 503
 
     except Exception:
-        logger.exception("Error generando la guía.")
+        logger.exception("Error generando o guardando la guía.")
         return jsonify({
             "error": "No se pudo generar la guía en este momento."
         }), 502
