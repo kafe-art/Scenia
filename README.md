@@ -27,7 +27,7 @@ Scenia/
 
 ## 🚀 Inicio Rápido
 
-### 1. Backend (FastAPI)
+### 1. Backend (Flask + Gemini + Supabase)
 
 ```bash
 # Navegar al directorio del backend
@@ -49,12 +49,12 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Iniciar servidor de desarrollo
-uvicorn main:app --reload --port 8000
+python main.py
 ```
 
 - **API Base:** [http://localhost:8000](http://localhost:8000)
-- **Documentación Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Documentación ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Verificación de Salud:** [http://localhost:8000/salud](http://localhost:8000/salud)
+- **Pruebas de Contratos:** `python -m unittest discover -s tests -v`
 
 ---
 

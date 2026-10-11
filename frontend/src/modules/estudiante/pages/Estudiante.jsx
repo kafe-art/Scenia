@@ -57,7 +57,49 @@ function Estudiante() {
 
         {resultado && (
           <div className="resultado">
-            <h3>Retroalimentación</h3>
+            <h3>Retroalimentación Pedagógica</h3>
+
+            {resultado.resumen && (
+              <p className="resumen-analisis">
+                <strong>Resumen:</strong> {resultado.resumen}
+              </p>
+            )}
+
+            {resultado.indicadores && resultado.indicadores.length > 0 && (
+              <div className="indicadores-section">
+                <h4>Indicadores Formativos:</h4>
+                <div className="indicadores-lista">
+                  {resultado.indicadores.map((ind, idx) => (
+                    <div key={idx} className="indicador-item">
+                      <div className="indicador-header">
+                        <strong>{ind.nombre}</strong>
+                        {ind.nivel && (
+                          <span className={`badge nivel-${ind.nivel.toLowerCase().replace(/\s+/g, '-')}`}>
+                            {ind.nivel}
+                          </span>
+                        )}
+                      </div>
+                      <p>{ind.observacion}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(resultado.pregunta_sugerida || resultado.pregunta_profundizacion) && (
+              <div className="pregunta-guia">
+                <strong>Para seguir pensando y dialogando:</strong>
+                <p>{resultado.pregunta_sugerida || resultado.pregunta_profundizacion}</p>
+              </div>
+            )}
+
+            {resultado.limitaciones && (
+              <p className="limitaciones-nota">
+                <small><strong>Nota orientativa:</strong> {resultado.limitaciones}</small>
+              </p>
+            )}
+
+            {/* Soporte retrocompatible */}
             {resultado.emociones_detectadas && (
               <p>
                 <strong>Emociones identificadas:</strong>{' '}
@@ -73,12 +115,6 @@ function Estudiante() {
               <p>
                 <strong>Comentario:</strong> {resultado.retroalimentacion}
               </p>
-            )}
-            {resultado.pregunta_profundizacion && (
-              <div className="pregunta-guia">
-                <strong>Para seguir pensando:</strong>
-                <p>{resultado.pregunta_profundizacion}</p>
-              </div>
             )}
           </div>
         )}

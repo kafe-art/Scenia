@@ -118,7 +118,48 @@ function Docente() {
         {guia && (
           <div className="resultado">
             <h3>{guia.titulo || 'Guía Generada'}</h3>
+            {guia.objetivo && (
+              <p><strong>Objetivo pedagógico:</strong> {guia.objetivo}</p>
+            )}
             {guia.introduccion && <p>{guia.introduccion}</p>}
+
+            {guia.materiales && guia.materiales.length > 0 && (
+              <div className="materiales-section">
+                <h4>Materiales necesarios:</h4>
+                <ul>
+                  {guia.materiales.map((m, idx) => (
+                    <li key={idx}>{m}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {guia.personajes && guia.personajes.length > 0 && (
+              <div className="personajes-section">
+                <h4>Personajes para la dramatización:</h4>
+                <div className="personajes-grid">
+                  {guia.personajes.map((p, idx) => (
+                    <div key={idx} className="personaje-card">
+                      <strong>{p.nombre}:</strong> <span>{p.descripcion}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {guia.escenas && guia.escenas.length > 0 && (
+              <div className="escenas-section">
+                <h4>Escenas y Dinámicas:</h4>
+                <div className="momentos">
+                  {guia.escenas.map((e, idx) => (
+                    <div key={idx} className="momento">
+                      <h5>{e.nombre} ({e.duracion_minutos || 10} min)</h5>
+                      <p>{e.instrucciones}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {guia.momentos && (
               <div className="momentos">
@@ -143,12 +184,23 @@ function Docente() {
               </div>
             )}
 
-            {guia.preguntas_debate && (
+            {(guia.preguntas_reflexion || guia.preguntas_debate) && (
               <div className="preguntas">
-                <h4>Preguntas para el Diálogo:</h4>
+                <h4>Preguntas para la Reflexión y Debate:</h4>
                 <ul>
-                  {guia.preguntas_debate.map((p, idx) => (
+                  {(guia.preguntas_reflexion || guia.preguntas_debate).map((p, idx) => (
                     <li key={idx}>{p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {guia.recomendaciones_docente && guia.recomendaciones_docente.length > 0 && (
+              <div className="recomendaciones">
+                <h4>Recomendaciones pedagógicas para el docente:</h4>
+                <ul>
+                  {guia.recomendaciones_docente.map((r, idx) => (
+                    <li key={idx}>{r}</li>
                   ))}
                 </ul>
               </div>

@@ -36,17 +36,18 @@ app.register_blueprint(metricas_bp)
 @app.get("/")
 def inicio():
     return jsonify({
-        "mensaje": "CulturaMétrica API funcionando correctamente",
+        "mensaje": "Scenia API funcionando correctamente",
         "version": "1.0.0",
     })
 
 
 @app.get("/salud")
+@app.get("/health")
 def salud():
     from app.services.gemini_service import client
     return jsonify({
         "estado": "ok",
-        "servicio": "CulturaMétrica API",
+        "servicio": "Scenia API",
         "gemini_configurado": client is not None,
     })
 

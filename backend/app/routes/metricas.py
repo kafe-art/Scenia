@@ -15,6 +15,8 @@ def get_metricas():
     return jsonify({
         "ok": True,
         "demo": True,
+        "total_obras": 3,
+        "total_guias": 12,
         "total_actividades": 12,
         "total_reflexiones": 47,
         "indicadores": [
