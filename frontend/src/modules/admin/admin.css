@@ -1,0 +1,611 @@
+/* ==========================================================================
+   SCENIA - ADMIN DASHBOARD STYLES (Soft Cards, Glassmorphism & Data Tables)
+   ========================================================================== */
+
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeInAdmin 0.4s ease-out;
+}
+
+@keyframes fadeInAdmin {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 1. Header del Admin con Tabs Rápidos */
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  background: rgba(238, 242, 246, 0.85);
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admin-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #556970;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-tab:hover {
+  color: #07151a;
+}
+
+.admin-tab.is-active {
+  background: #ffffff;
+  color: #07151a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 2. Grid de KPIs (Soft Cards) */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.kpi-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.kpi-caption {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7b8e95;
+}
+
+.kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.kpi-icon.crimson { background: #fee2e2; color: #e63946; }
+.kpi-icon.teal { background: #ccfbf1; color: #0d9488; }
+.kpi-icon.amber { background: #fef3c7; color: #d97706; }
+.kpi-icon.blue { background: #e0e7ff; color: #4f46e5; }
+
+.kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #07151a;
+  line-height: 1;
+}
+
+.kpi-target {
+  font-size: 13px;
+  color: #7b8e95;
+}
+
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.kpi-badge.up { background: #dcfce7; color: #15803d; }
+.kpi-badge.meta { background: #e0f2fe; color: #0369a1; }
+.kpi-badge.warn { background: #fef3c7; color: #b45309; }
+
+/* Micro barra de progreso */
+.kpi-progress {
+  width: 100%;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.kpi-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3. Paneles y Gráficos */
+.admin-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 22px;
+  padding: 26px 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #07151a;
+  margin: 0;
+}
+
+.admin-card-subtitle {
+  font-size: 13px;
+  color: #7b8e95;
+  margin-top: 4px;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1050px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 4. Tabla Avanzada de Colegios / Datos */
+.admin-table-container {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #edf2f7;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.admin-table th {
+  background: #f8fafc;
+  padding: 14px 18px;
+  font-weight: 700;
+  color: #475569;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+  background: #f8fafc;
+}
+
+/* Status Badges con Ping Animado */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pill.activado {
+  background: #dcfce7;
+  color: #15803d;
+}
+.status-pill.activado .status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.status-pill.vistobueno {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.status-pill.vistobueno .status-dot {
+  background: #0ea5e9;
+}
+
+.status-pill.contactado {
+  background: #fef3c7;
+  color: #b45309;
+}
+.status-pill.contactado .status-dot {
+  background: #f59e0b;
+}
+
+.status-pill.prospecto {
+  background: #f1f5f9;
+  color: #475569;
+}
+.status-pill.prospecto .status-dot {
+  background: #94a3b8;
+}
+
+/* 5. Slide-Over Drawer (Cajón Lateral) */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 21, 26, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeInDrawer 0.25s ease-out;
+}
+
+@keyframes fadeInDrawer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drawer-panel {
+  width: 100%;
+  max-width: 540px;
+  background: #ffffff;
+  height: 100vh;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideInDrawer 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInDrawer {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #edf2f7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 10;
+}
+
+.drawer-body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+}
+
+.drawer-footer {
+  padding: 20px 28px;
+  border-top: 1px solid #edf2f7;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f8fafc;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Switch reactivo */
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.switch-input {
+  width: 44px;
+  height: 24px;
+  appearance: none;
+  background: #cbd5e1;
+  border-radius: 999px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.switch-input:checked {
+  background: #e63946;
+}
+
+.switch-input::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+
+.switch-input:checked::after {
+  transform: translateX(20px);
+}
+
+/* ==========================================================================
+   6. HERO HEADER & AMBIENT MESH GLOW (Landing del Admin)
+   ========================================================================== */
+.admin-hero-hub {
+  position: relative;
+  background: linear-gradient(135deg, #07151a 0%, #0d2833 60%, #153c4d 100%);
+  border-radius: 28px;
+  padding: 36px 40px;
+  color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(7, 21, 26, 0.2);
+}
+
+.admin-hero-glow {
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.35) 0%, rgba(13, 148, 136, 0.25) 50%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  border-radius: 50%;
+  animation: pulseGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.9) translate(0, 0); opacity: 0.7; }
+  100% { transform: scale(1.15) translate(-20px, 20px); opacity: 1; }
+}
+
+.hero-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.hero-stat-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 22px;
+  transition: all 0.25s ease;
+}
+
+.hero-stat-card:hover {
+  background: rgba(255, 255, 255, 0.13);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hero-stat-val {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hero-stat-lbl {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   7. THE PARTNER GRID & 3D SOFT CARDS
+   ========================================================================== */
+.partner-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sliding-filters {
+  display: flex;
+  background: #eef2f6;
+  padding: 4px;
+  border-radius: 999px;
+  gap: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.filter-pill {
+  border: 0;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filter-pill:hover {
+  color: #07151a;
+}
+
+.filter-pill.is-active {
+  background: #ffffff;
+  color: #07151a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.partner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 22px;
+}
+
+.partner-card-3d {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.partner-card-3d:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+  border-color: rgba(203, 213, 225, 1);
+}
+
+.partner-card-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  filter: blur(35px);
+  opacity: 0.15;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.partner-card-3d:hover .partner-card-glow {
+  opacity: 0.3;
+  transform: scale(1.2);
+}
+
+/* Status badging with ping animation */
+.status-pill.status-activo {
+  background: #dcfce7;
+  color: #15803d;
+}
+.status-pill.status-activo .status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  animation: pingPulseGreen 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.status-pill.status-renovacion {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.status-pill.status-renovacion .status-dot {
+  background: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+  animation: pingPulseBlue 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.status-pill.status-pendiente {
+  background: #fef3c7;
+  color: #b45309;
+}
+.status-pill.status-pendiente .status-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+@keyframes pingPulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes pingPulseBlue {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.6); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+}

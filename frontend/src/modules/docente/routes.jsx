@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import Docente from './pages/Docente'
-import InicioDocente, { DetalleClase } from './pages/InicioDocente'
+import InicioDocente from './pages/InicioDocente'
+import DetalleClase from './pages/DetalleClase'
 import ModuleNotFound from '../../components/ModuleNotFound'
+import './docente.css'
 
 // Rutas relativas a /docente. Añadir aquí las nuevas pantallas del actor.
 export default function DocenteRoutes() {

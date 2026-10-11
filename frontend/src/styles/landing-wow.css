@@ -1,0 +1,370 @@
+/* ==========================================================================
+   SCENIA - AWWWARDS LANDING PAGE STYLES (Cinematic & Interactive UX)
+   ========================================================================== */
+
+/* 1. Header con Glassmorphism Flotante al Hacer Scroll */
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 22px 48px;
+}
+
+.public-header.is-scrolled {
+  top: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-radius: 999px;
+  padding: 12px 28px;
+  background: rgba(7, 21, 26, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* 2. Hero Section Mejorada con Volumetría */
+.hero {
+  position: relative;
+  min-height: 86vh;
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr;
+  align-items: center;
+  gap: 50px;
+  padding: 40px 0 70px;
+}
+
+/* Foco Seguidor Cenital en el Fondo del Hero */
+.hero-ambient-spotlight {
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 750px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.14) 0%, rgba(13, 32, 38, 0.05) 60%, transparent 80%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 10;
+}
+
+.hero-copy h1 {
+  font-size: 64px;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  margin: 18px 0 22px;
+  color: #fdfbf7;
+}
+
+/* Efecto Shimmer en la palabra clave */
+.hero-copy h1 em {
+  font-style: italic;
+  font-family: serif;
+  color: #e63946;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(90deg, #e63946 0%, #ff8a93 50%, #e63946 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 6s linear infinite;
+}
+
+@keyframes textShimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* 3. Botones Magnéticos */
+.magnetic-btn-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  outline: none;
+  background: transparent;
+}
+
+.magnetic-btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+
+.magnetic-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.magnetic-glow.is-active {
+  opacity: 1;
+}
+
+/* 4. Portal Escénico 3D */
+.stage-portal-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+.stage-portal-halo {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.28) 0%, rgba(7, 21, 26, 0.1) 70%, transparent 90%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.stage-portal-circle {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.stage-orbital-ring {
+  position: absolute;
+  inset: -24px;
+  pointer-events: none;
+  z-index: 8;
+  animation: rotateOrbital 32s linear infinite;
+  opacity: 0.65;
+}
+
+@keyframes rotateOrbital {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.orbital-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.orbital-text {
+  font-size: 9.5px;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 4.8px;
+  fill: rgba(253, 251, 247, 0.7);
+}
+
+.stage-circle-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(230, 57, 70, 0.55);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), inset 0 0 40px rgba(0, 0, 0, 0.6);
+  background: #0d2026;
+}
+
+.stage-circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.04);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage-portal-circle:hover .stage-circle-img {
+  transform: scale(1.1);
+}
+
+.stage-curtain-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(7, 21, 26, 0.7) 100%);
+  pointer-events: none;
+}
+
+.stage-sticker-top {
+  position: absolute;
+  top: 10px;
+  left: -15px;
+  z-index: 12;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.stage-sticker-bottom {
+  position: absolute;
+  bottom: 12px;
+  right: -10px;
+  z-index: 12;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* 5. Indicador de Desplazamiento */
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+.hero-scroll-indicator:hover {
+  opacity: 1;
+}
+
+.scroll-mouse-pill {
+  width: 18px;
+  height: 28px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.scroll-wheel-dot {
+  width: 3.5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #e63946;
+  animation: scrollWheel 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes scrollWheel {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  61% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.scroll-text {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #d0d5c9;
+}
+
+/* 6. Tarjetas 3D Tilt */
+.tilt-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.tilt-card:hover {
+  border-color: rgba(230, 57, 70, 0.4);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.tilt-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.tilt-inner {
+  position: relative;
+  z-index: 2;
+}
+
+/* 7. Reducción de Movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .stage-orbital-ring {
+    animation: none;
+  }
+  .hero-copy h1 em {
+    animation: none;
+  }
+  .scroll-wheel-dot {
+    animation: none;
+  }
+}
+
+/* 8. Responsividad para Móviles */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 40px;
+  }
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-copy h1 {
+    font-size: 44px;
+  }
+  .button-row {
+    justify-content: center;
+  }
+  .stage-portal-circle {
+    width: 320px;
+    height: 320px;
+  }
+  .stage-sticker-top {
+    left: 0;
+  }
+  .stage-sticker-bottom {
+    right: 0;
+  }
+  .hero-scroll-indicator {
+    display: none;
+  }
+}
